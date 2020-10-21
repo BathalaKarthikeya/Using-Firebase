@@ -1,13 +1,20 @@
 var ball;
+var database;
+var position;
 
 function setup(){
     createCanvas(500,500);
+    database = firebase.database();
     ball = createSprite(250,250,10,10);
     ball.shapeColor = "red";
+    var ballPosition = database.ref("ball/Position");
+    ballPosition.on("value",read);
 }
 
 function draw(){
     background("white");
+
+    if(position!== undefined){
     if(keyDown(LEFT_ARROW)){
         changePosition(-1,0);
     }
@@ -20,10 +27,20 @@ function draw(){
     else if(keyDown(DOWN_ARROW)){
         changePosition(0,+1);
     }
+
     drawSprites();
 }
+}
 
+function read(data){
+    position = data.val();
+    ball.x = position.x;
+    ball.y = position.y;
+}
 function changePosition(x,y){
-    ball.x = ball.x + x;
-    ball.y = ball.y + y;
+    database.ref("ball/Position").set({
+        'x':position.x+x,
+        'y' :position.y+y
+    })
+
 }
